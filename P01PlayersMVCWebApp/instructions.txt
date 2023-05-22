@@ -1,0 +1,18 @@
+
+remember to create connection string in appsetings.json
+
+"ConnectionStrings": {
+    "DefaultConnectionString": "..."
+  },
+
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet ef dbcontext scaffold "name=DefaultConnectionString" Microsoft.EntityFrameworkCore.SqlServer -o Models
+
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
+dotnet aspnet-codegenerator controller -name VolleyballPlayersController -m VolleyballPlayer -dc VolleyballWebContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries
+
+
+
+dotnet aspnet-codegenerator controller -name VolleyballPlayersAPIController -m VolleyballPlayer -dc VolleyballWebContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries
