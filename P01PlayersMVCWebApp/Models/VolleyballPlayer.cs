@@ -12,4 +12,13 @@ public partial class VolleyballPlayer
     public string Position { get; set; } = null!;
 
     public int Number { get; set; }
+
+    public int MatchesPlayed { get; set; }
+
+    public int PointsScored { get; set; }
+
+    public int MedalsWon { get; set; }
+
+    public double Score { get; set; }
+
 }

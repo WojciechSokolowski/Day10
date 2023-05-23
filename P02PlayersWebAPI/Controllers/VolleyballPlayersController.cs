@@ -18,6 +18,7 @@ namespace P02PlayersWebAPI.Controllers
     {
         private readonly VolleyballWebContext _context;
 
+
         public VolleyballPlayersController(VolleyballWebContext context)
         {
             _context = context;
@@ -37,6 +38,14 @@ namespace P02PlayersWebAPI.Controllers
                 return Problem("Error occurred while retrieving the size data.", statusCode: 500);
             }
         }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<VolleyballPlayer>>> GetAllVolleyballPlayers()
+        {
+            var players = await _context.VolleyballPlayers.ToListAsync();
+            return players;
+        }
+
+
 
         // GET: api/VolleyballPlayers
         [HttpGet("{page}/{pageSize}")]

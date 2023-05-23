@@ -29,6 +29,21 @@
                 <span asp-validation-for="Number" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="MatchesPlayed" class="control-label"></label>
+                <input asp-for="MatchesPlayed" class="form-control" />
+                <span asp-validation-for="MatchesPlayed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PointsScored" class="control-label"></label>
+                <input asp-for="PointsScored" class="form-control" />
+                <span asp-validation-for="PointsScored" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MedalsWon" class="control-label"></label>
+                <input asp-for="MedalsWon" class="form-control" />
+                <span asp-validation-for="MedalsWon" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>

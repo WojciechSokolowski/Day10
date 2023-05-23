@@ -22,6 +22,7 @@ namespace P01PlayersMVCWebApp.Controllers
         private readonly HttpClient _client;
         private readonly ApiSettings _apiSettings;
         private readonly string _resourcePath;
+        private readonly ScoreCalculator _scoreCalculator;
         public VolleyballPlayersAPIController(IHttpClientFactory clientFactory, IOptions<ApiSettings> apiSettings)
         {
             _client = clientFactory.CreateClient();
@@ -67,6 +68,16 @@ namespace P01PlayersMVCWebApp.Controllers
                 var playersContent = await playersResponse.Content.ReadAsStringAsync();
                 var volleyballPlayers = JsonConvert.DeserializeObject<List<VolleyballPlayer>>(playersContent);
 
+                foreach( VolleyballPlayer player in volleyballPlayers )
+                {
+
+                    // TODO implement it as method
+                    if (player.MatchesPlayed > 0)
+                        player.Score = 5 * (double)player.PointsScored / player.MatchesPlayed + 100 * player.MedalsWon;
+                    else
+                        player.Score = 0;
+                }
+
                 // Create pager object
                 var pager = new Pager<VolleyballPlayer>(totalCount, pageSize, page, volleyballPlayers);
 
@@ -74,7 +85,7 @@ namespace P01PlayersMVCWebApp.Controllers
             }
             catch (Exception ex)
             {
-                return Problem("An error occurred while processing your request.", statusCode: 500);
+                return Problem("An error occurred while processing your request, "+ex.Message, statusCode: 500);
             }
         }        // GET: VolleyballPlayersAPI/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -109,7 +120,7 @@ namespace P01PlayersMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Position,Number")] VolleyballPlayer volleyballPlayer)
+        public async Task<IActionResult> Create([Bind("Id,Name,Position,Number,MatchesPlayed,PointsScored,MedalsWon")] VolleyballPlayer volleyballPlayer)
         {
             if (ModelState.IsValid)
             {
@@ -150,7 +161,7 @@ namespace P01PlayersMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Position,Number")] VolleyballPlayer volleyballPlayer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Position,Number,MatchesPlayed,PointsScored,MedalsWon")] VolleyballPlayer volleyballPlayer)
         {
             if (id != volleyballPlayer.Id)
             {
