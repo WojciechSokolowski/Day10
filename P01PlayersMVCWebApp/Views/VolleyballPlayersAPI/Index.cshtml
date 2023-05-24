@@ -26,6 +26,7 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Data.First().Score)
+                <a asp-action="Index" asp-route-sort="score">Sort</a>
             </th>
             <th></th>
         </tr>
@@ -66,9 +67,27 @@
         }
         else
         {
-            <a href="@Url.Action("Index", new { page = i })">@i</a>
+            if (string.IsNullOrEmpty(ViewBag.Sort))
+            {
+                <a href="@Url.Action("Index", new { page = i })">@i</a>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", new { page = i, sort = ViewBag.Sort })">@i</a>
+            }
         }
     }
 </div>
+<div>
+    <p>Sort by: 
+        <a href="@Url.Action("Index", new { page = Model.CurrentPage, sort = "score" })">Score</a> |
+        <a href="@Url.Action("Index", new { page = Model.CurrentPage, sort = "score_desc" })">Score Descending</a> |
+        <a href="@Url.Action("Index", new { page = Model.CurrentPage, sort = "id" })">Id</a> | 
+        <a href="@Url.Action("Index", new { page = Model.CurrentPage, sort = "id_desc" })">Id Descending</a> |
+        <a href="@Url.Action("Index", new { page = Model.CurrentPage, sort = "name" })">Name</a> | 
+        <a href="@Url.Action("Index", new { page = Model.CurrentPage, sort = "name_desc" })">Name Descending</a>
+    </p>
+</div>
+
 <p>Total Elements: @Model.TotalCount</p>
 <p>Total Pages: @Model.TotalPages</p>

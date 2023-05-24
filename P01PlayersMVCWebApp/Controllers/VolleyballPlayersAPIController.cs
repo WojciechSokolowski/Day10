@@ -31,35 +31,11 @@ namespace P01PlayersMVCWebApp.Controllers
         }
 
         // GET: VolleyballPlayersAPI
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10, string sort = "")
         {
             try
             {
-                var totalCountResponse = await _client.GetAsync($"{_apiSettings.BaseUrl}{_resourcePath}/all");
-                if (!totalCountResponse.IsSuccessStatusCode)
-                {
-                    return Problem("Cannot access API to retrieve size data.", statusCode: (int)totalCountResponse.StatusCode);
-                }
-
-                var totalCountContent = await totalCountResponse.Content.ReadAsStringAsync();
-                var totalCountData = JObject.Parse(totalCountContent);
-                if (!int.TryParse(totalCountData["totalCount"].ToString(), out var totalCount))
-                {
-                    return Problem("Invalid size data received from API.", statusCode: 500);
-                }
-
-
-                // Calculate total pages
-                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-
-                // Validate page number
-                if (page < 1 || page > totalPages)
-                {
-                    return BadRequest("Invalid page number.");
-                }
-
-                // Get volleyball players for the specified page
-                var playersResponse = await _client.GetAsync($"{_apiSettings.BaseUrl}{_resourcePath}/{page}/{pageSize}");
+                var playersResponse = await _client.GetAsync($"{_apiSettings.BaseUrl}{_resourcePath}");
                 if (!playersResponse.IsSuccessStatusCode)
                 {
                     return Problem("Cannot access API to retrieve players.", statusCode: (int)playersResponse.StatusCode);
@@ -68,29 +44,76 @@ namespace P01PlayersMVCWebApp.Controllers
                 var playersContent = await playersResponse.Content.ReadAsStringAsync();
                 var volleyballPlayers = JsonConvert.DeserializeObject<List<VolleyballPlayer>>(playersContent);
 
-                foreach( VolleyballPlayer player in volleyballPlayers )
-                {
 
-                    // TODO implement it as method
+                foreach (VolleyballPlayer player in volleyballPlayers)
+                {
+                    // TODO: Implement score calculation logic for each player
                     if (player.MatchesPlayed > 0)
                     {
                         player.Score = 5 * (double)player.PointsScored / player.MatchesPlayed + 100 * player.MedalsWon;
-                        player.Score= Math.Round(player.Score, 2);
+                        player.Score = Math.Round(player.Score, 2);
                     }
                     else
+                    {
                         player.Score = 0;
+                    }
                 }
 
-                // Create pager object
-                var pager = new Pager<VolleyballPlayer>(totalCount, pageSize, page, volleyballPlayers);
+
+                // Sort the players based on score
+                switch (sort)
+                {
+                    case "score":
+                        volleyballPlayers = volleyballPlayers.OrderBy(p => p.Score).ToList();
+                        break;
+                    case "score_desc":
+                        volleyballPlayers = volleyballPlayers.OrderByDescending(p => p.Score).ToList();
+                        break;
+                    case "id":
+                        volleyballPlayers = volleyballPlayers.OrderBy(p => p.Id).ToList();
+                        break;
+                    case "id_desc":
+                        volleyballPlayers = volleyballPlayers.OrderByDescending(p => p.Id).ToList();
+                        break;
+                    case "name":
+                        volleyballPlayers = volleyballPlayers.OrderBy(p => p.Name).ToList();
+                        break;
+                    case "name_desc":
+                        volleyballPlayers = volleyballPlayers.OrderByDescending(p => p.Name).ToList();
+                        break;
+                    default:
+                        // No sort specified, use the default order
+                        // Add your default sorting logic here
+                        break;
+                }
+
+                // Calculate total count and totalPages based on the retrieved players
+                var totalCount = volleyballPlayers.Count;
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                // Validate page number
+                if (page < 1 || page > totalPages)
+                {
+                    return BadRequest("Invalid page number.");
+                }
+
+                // Get players for the specified page
+                var startIndex = (page - 1) * pageSize;
+                var playersForPage = volleyballPlayers.Skip(startIndex).Take(pageSize).ToList();
+
+                // Store the sort parameter in the ViewBag
+                ViewBag.Sort = sort;
+
+                // Create pager object for the specified page
+                var pager = new Pager<VolleyballPlayer>(totalCount, pageSize, page, playersForPage);
 
                 return View(pager);
             }
             catch (Exception ex)
             {
-                return Problem("An error occurred while processing your request, "+ex.Message, statusCode: 500);
+                return Problem("An error occurred while processing your request, " + ex.Message, statusCode: 500);
             }
-        }        // GET: VolleyballPlayersAPI/Details/5
+        }
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

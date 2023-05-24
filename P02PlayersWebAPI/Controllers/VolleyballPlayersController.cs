@@ -41,8 +41,15 @@ namespace P02PlayersWebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VolleyballPlayer>>> GetAllVolleyballPlayers()
         {
-            var players = await _context.VolleyballPlayers.ToListAsync();
-            return players;
+            try
+            {
+                var players = await _context.VolleyballPlayers.ToListAsync();
+                return Ok(players);
+            }
+            catch (Exception ex) {
+            return Problem("Error occurred while retrieving the Volleyball players.", statusCode: 500);
+            }
+
         }
 
 
