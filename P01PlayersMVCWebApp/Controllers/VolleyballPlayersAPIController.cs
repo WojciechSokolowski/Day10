@@ -73,7 +73,10 @@ namespace P01PlayersMVCWebApp.Controllers
 
                     // TODO implement it as method
                     if (player.MatchesPlayed > 0)
+                    {
                         player.Score = 5 * (double)player.PointsScored / player.MatchesPlayed + 100 * player.MedalsWon;
+                        player.Score= Math.Round(player.Score, 2);
+                    }
                     else
                         player.Score = 0;
                 }
